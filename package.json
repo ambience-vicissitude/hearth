@@ -1,0 +1,27 @@
+{
+  "name": "hearth",
+  "version": "1.0.0",
+  "description": "three.js earth model",
+  "license": "MIT",
+  "keywords": [
+    "three.js",
+    "earth"
+  ],
+  "author": "bryling98-star",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "test": "npm run test",
+    "lint": "npx eslint ."
+  },
+  "dependencies": {
+    "globe-ar": "^1.20.1",
+    "globe.gl": "^2.45.0",
+    "simplex-noise": "^4.0.3",
+    "three": "^0.182.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2",
+    "vite": "^7.3.1"
+  }
+}

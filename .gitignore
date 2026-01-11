@@ -1,0 +1,4 @@
+.vscode
+node_modules
+venv
+datasets/gfs.t00z.pgrb2.0p25.f000
