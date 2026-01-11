@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wind Globe</title>
+    <style>
+      body { 
+        margin: 0; 
+        font-family: sans-serif; 
+        display: flex; 
+        flex-direction: column; 
+        height: 100vh;
+      }
+
+      #homeButton {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        background-color: #007acc;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        z-index: 1000;
+      }
+
+      #homeButton:hover {
+        background-color: #005fa3;
+      }
+
+      canvas {
+        display: block; /* removes default padding/margin */
+      }
+    </style>
+</head>
+<body>
+    <button id="homeButton" onclick="goHome()">Home</button>
+  <div id="globeViz"></div>
+
+  <!-- Three.js and Globe.gl modules -->
+  <script type="module" src="main.js"></script>
+</body>
+</html>
