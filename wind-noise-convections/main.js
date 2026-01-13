@@ -8,11 +8,14 @@ function goHome() {
 }
 
 // ---------------- CONFIG ----------------
-const LAT = 64;
-const LON = 128;
-const TIME_STEP = 0.015;
+// const LAT = 64;
+// const LON = 128;
+const LAT = 360; // 0.5° per row
+const LON = 720; // 0.5° per column
+const TIME_STEP = 0.005;
 const WIND_SCALE = 15;
-const PARTICLE_SPEED = 0.01;
+const PARTICLE_SPEED = 0.002;
+const PRE_ADVANCE = 50; // pre-advance time to start with motion
 
 // ---------------- STATE ----------------
 let windData;
@@ -36,10 +39,13 @@ function curlNoise(x, y, t) {
 }
 
 // ---------------- GLOBE ----------------
-const globe = Globe()
+const globe = Globe({
+  antialias: true, // smoother edges
+  devicePixelRatio: window.devicePixelRatio, // full HD / Retina
+})
   .width(window.innerWidth)
   .height(window.innerHeight)
-  .globeImageUrl("//unpkg.com/three-globe/example/img/earth-dark.jpg")
+  .globeImageUrl("//unpkg.com/three-globe/example/img/earth-night.jpg")
   .backgroundColor("#000")
   .pointRadius(0.15)
   .pointAltitude(0.01)
@@ -57,6 +63,9 @@ fetch("../datasets/wind.json")
   .then((r) => r.json())
   .then((data) => {
     windData = data;
+
+    // Pre-advance time to avoid initial stutter
+    for (let i = 0; i < PRE_ADVANCE; i++) time += TIME_STEP;
 
     globe
       .pointsData(windData.particles)
@@ -77,23 +86,71 @@ function updateWindField(t) {
 }
 
 // ---------------- ADVECT PARTICLES ----------------
+
+// ---------------- UTILS ----------------
+function bilinearInterpolation(lat, lon) {
+  const latNorm = ((lat + 90) / 180) * (180 - 1); // LAT assumed 180
+  const lonNorm = ((lon + 180) / 360) * (360 - 1); // LON assumed 360
+
+  const i0 = Math.floor(latNorm);
+  const j0 = Math.floor(lonNorm);
+  const i1 = Math.min(i0 + 1, 179);
+  const j1 = Math.min(j0 + 1, 359);
+
+  const di = latNorm - i0;
+  const dj = lonNorm - j0;
+
+  const idx00 = i0 * 360 + j0;
+  const idx01 = i0 * 360 + j1;
+  const idx10 = i1 * 360 + j0;
+  const idx11 = i1 * 360 + j1;
+
+  const u00 = windData.grid[idx00].u;
+  const v00 = windData.grid[idx00].v;
+  const u01 = windData.grid[idx01].u;
+  const v01 = windData.grid[idx01].v;
+  const u10 = windData.grid[idx10].u;
+  const v10 = windData.grid[idx10].v;
+  const u11 = windData.grid[idx11].u;
+  const v11 = windData.grid[idx11].v;
+
+  const u0 = u00 * (1 - dj) + u01 * dj;
+  const u1 = u10 * (1 - dj) + u11 * dj;
+  const u = u0 * (1 - di) + u1 * di;
+
+  const v0 = v00 * (1 - dj) + v01 * dj;
+  const v1 = v10 * (1 - dj) + v11 * dj;
+  const v = v0 * (1 - di) + v1 * di;
+
+  return { u, v };
+}
 function advectParticles() {
   windData.particles.forEach((p) => {
-    const latIdx = Math.floor(((p.lat + 90) / 180) * LAT);
-    const lonIdx = Math.floor(((p.lon + 180) / 360) * LON);
-    const idx = latIdx * LON + lonIdx;
+    const { u, v } = bilinearInterpolation(p.lat, p.lon);
 
-    const wind = windData.grid[idx];
-    if (!wind) return;
-
-    p.lat += wind.v * PARTICLE_SPEED;
-    p.lon += wind.u * PARTICLE_SPEED;
+    p.lat += v * PARTICLE_SPEED;
+    p.lon += u * PARTICLE_SPEED;
 
     // wrap globe
-    if (p.lat > 90) p.lat = -90;
-    if (p.lat < -90) p.lat = 90;
-    if (p.lon > 180) p.lon = -180;
-    if (p.lon < -180) p.lon = 180;
+    if (p.lat > 90) p.lat -= 180;
+    if (p.lat < -90) p.lat += 180;
+    if (p.lon > 180) p.lon -= 360;
+    if (p.lon < -180) p.lon += 360;
+    //   const latIdx = Math.floor(((p.lat + 90) / 180) * LAT);
+    //   const lonIdx = Math.floor(((p.lon + 180) / 360) * LON);
+    //   const idx = latIdx * LON + lonIdx;
+
+    //   const wind = windData.grid[idx];
+    //   if (!wind) return;
+
+    //   p.lat += wind.v * PARTICLE_SPEED;
+    //   p.lon += wind.u * PARTICLE_SPEED;
+
+    //   // wrap globe
+    //   if (p.lat > 90) p.lat = -90;
+    //   if (p.lat < -90) p.lat = 90;
+    //   if (p.lon > 180) p.lon = -180;
+    //   if (p.lon < -180) p.lon = 180;
   });
 }
 

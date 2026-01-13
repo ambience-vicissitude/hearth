@@ -4,7 +4,7 @@ import { createNoise3D } from "simplex-noise";
 // ---------------- CONFIG ----------------
 const LAT = 180; // higher resolution for smoother bands
 const LON = 360;
-const PARTICLES = 10000; // more particles for realistic flow
+const PARTICLES = 100000; // more particles for realistic flow
 const WIND_SCALE_LARGE = 10;
 const WIND_SCALE_SMALL = 2;
 const OUTPUT = "wind.json";
@@ -23,11 +23,9 @@ function multiScaleCurlNoise(x, y, t) {
   const lt = t * 0.05;
 
   const largeU =
-    ((noiseLarge(lx, ly + e, lt) - noiseLarge(lx, ly - e, lt)) / (2 * e)) *
-    WIND_SCALE_LARGE;
+    ((noiseLarge(lx, ly + e, lt) - noiseLarge(lx, ly - e, lt)) / (2 * e)) * WIND_SCALE_LARGE;
   const largeV =
-    ((noiseLarge(lx + e, ly, lt) - noiseLarge(lx - e, ly, lt)) / (2 * e)) *
-    WIND_SCALE_LARGE;
+    ((noiseLarge(lx + e, ly, lt) - noiseLarge(lx - e, ly, lt)) / (2 * e)) * WIND_SCALE_LARGE;
 
   // Small scale (fast moving, local turbulence)
   const sx = x * 4;
@@ -35,11 +33,9 @@ function multiScaleCurlNoise(x, y, t) {
   const st = t * 2;
 
   const smallU =
-    ((noiseSmall(sx, sy + e, st) - noiseSmall(sx, sy - e, st)) / (2 * e)) *
-    WIND_SCALE_SMALL;
+    ((noiseSmall(sx, sy + e, st) - noiseSmall(sx, sy - e, st)) / (2 * e)) * WIND_SCALE_SMALL;
   const smallV =
-    ((noiseSmall(sx + e, sy, st) - noiseSmall(sx - e, sy, st)) / (2 * e)) *
-    WIND_SCALE_SMALL;
+    ((noiseSmall(sx + e, sy, st) - noiseSmall(sx - e, sy, st)) / (2 * e)) * WIND_SCALE_SMALL;
 
   // Combine scales
   let u = largeU + smallU;
@@ -101,10 +97,7 @@ function generateParticles(count = PARTICLES) {
 const windField = generateWindField(0);
 const particles = generateParticles();
 
-fs.writeFileSync(
-  OUTPUT,
-  JSON.stringify({ grid: windField, particles }, null, 2),
-);
+fs.writeFileSync(OUTPUT, JSON.stringify({ grid: windField, particles }, null, 2));
 
 // eslint-disable-next-line no-undef
 console.log(
@@ -112,5 +105,5 @@ console.log(
   particles.length,
   "particles,",
   windField.length,
-  "grid points",
+  "grid points"
 );

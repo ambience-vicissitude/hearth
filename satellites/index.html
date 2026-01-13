@@ -1,0 +1,32 @@
+<head>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    #time-log {
+      position: absolute;
+      font-size: 12px;
+      font-family: sans-serif;
+      padding: 5px;
+      border-radius: 3px;
+      background-color: rgba(200, 200, 200, 0.1);
+      color: lavender;
+      bottom: 10px;
+      right: 10px;
+    }
+  </style>
+
+  <script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
+</head>
+
+<body>
+  <div id="chart"></div>
+  <div id="time-log"></div>
+
+  <button id="homeButton" onclick="goHome()">Home</button>
+  <div id="globeViz"></div>
+
+  <!-- Three.js and Globe.gl modules -->
+  <script type="module" src="main.js"></script>
+</body>
