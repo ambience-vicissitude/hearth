@@ -12,7 +12,9 @@
   "main": "main.js",
   "scripts": {
     "test": "npm run test",
-    "lint": "npx eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "globe-ar": "^1.20.1",
@@ -22,6 +24,9 @@
   },
   "devDependencies": {
     "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.7.4",
     "vite": "^7.3.1"
   }
 }

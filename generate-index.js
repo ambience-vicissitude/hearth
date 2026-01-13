@@ -1,5 +1,5 @@
-import fs  from "fs";
-import path  from "path";
+import fs from "fs";
+import path from "path";
 
 const rootDir = "."; // root folder
 const excludeFile = path.join(rootDir, "exclude.txt");
@@ -10,9 +10,9 @@ if (fs.existsSync(excludeFile)) {
   excludedPaths = fs
     .readFileSync(excludeFile, "utf-8")
     .split("\n")
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .map(line => line.replace(/\\/g, "/")); // normalize slashes
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0)
+    .map((line) => line.replace(/\\/g, "/")); // normalize slashes
 }
 
 // Recursive function: returns array of {name, path, children}
@@ -37,7 +37,7 @@ function getDirsWithIndex(dir, basePath = "") {
         result.push({
           name: entry.name,
           path: hasIndex ? relativePath : null, // only generate link if index.html exists
-          children
+          children,
         });
       }
     }
@@ -52,12 +52,10 @@ function generateHTMLList(items) {
   return `<ul>
     ${items
       .map(
-        item => `
+        (item) => `
       <li>
         ${
-          item.path
-            ? `<a href="${item.path}/">${item.name}</a>`
-            : `<span>${item.name}</span>` // no link if index.html missing
+          item.path ? `<a href="${item.path}/">${item.name}</a>` : `<span>${item.name}</span>` // no link if index.html missing
         }
         ${generateHTMLList(item.children)}
       </li>`
@@ -92,4 +90,5 @@ const html = `<!DOCTYPE html>
 `;
 
 fs.writeFileSync(path.join(rootDir, "index.html"), html);
+// eslint-disable-next-line no-undef
 console.log("Root index.html with hierarchical TOC generated!");
